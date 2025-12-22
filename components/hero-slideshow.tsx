@@ -68,7 +68,7 @@ export function HeroSlideshow({ products }: HeroSlideshowProps) {
 
   if (displayProducts.length === 0) {
     return (
-      <section className="relative h-[600px] bg-linear-to-br from-primary/10 via-background to-secondary/10">
+      <section className="relative h-150 bg-linear-to-br from-primary/10 via-background to-secondary/10">
         <div className="container mx-auto px-4 h-full flex items-center justify-center">
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-bold mb-6">Welcome to LuxeAccessories</h1>
@@ -89,7 +89,7 @@ export function HeroSlideshow({ products }: HeroSlideshowProps) {
   const currentProduct = displayProducts[currentSlide]
 
   return (
-    <section className="relative h-[600px] md:h-[700px] overflow-hidden bg-background">
+    <section className="relative h-150 md:h-175 overflow-hidden bg-background">
       {/* Slideshow Container */}
       <div className="relative h-full">
         {displayProducts.map((product: any, index: number) => (
@@ -108,7 +108,7 @@ export function HeroSlideshow({ products }: HeroSlideshowProps) {
                 className="object-cover"
                 priority={index === 0}
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent" />
+              <div className="absolute inset-0 bg-linear-to-r from-black/70 via-black/50 to-transparent" />
             </div>
 
             {/* Content */}
