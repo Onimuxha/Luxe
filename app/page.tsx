@@ -51,7 +51,7 @@ export default async function HomePage() {
                           fill
                           className="object-cover group-hover:scale-105 transition-transform duration-300"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
+                        <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent flex items-end p-6">
                           <div>
                             <h3 className="text-white text-xl font-bold mb-1">{category.name}</h3>
                             <p className="text-white/80 text-sm">{category.description}</p>

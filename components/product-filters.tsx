@@ -18,7 +18,7 @@ export function ProductFilters() {
   }
 
   return (
-    <Card>
+    <Card className="py-6">
       <CardHeader>
         <CardTitle className="text-lg">Filters</CardTitle>
       </CardHeader>

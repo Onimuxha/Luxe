@@ -13,6 +13,7 @@ import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/hooks/use-toast"
 import type { CartItem } from "@/lib/types"
 import Image from "next/image"
+import { SiteHeader } from "@/components/site-header"
 
 export default function ContactPage() {
   const [cartItems, setCartItems] = useState<CartItem[]>([])
@@ -151,7 +152,9 @@ export default function ContactPage() {
   }
 
   return (
+    // SiteHeader
     <main className="min-h-screen">
+      <SiteHeader cartCount={cartItems.length} />
       {/* Hero Section */}
       <section className="relative bg-linear-to-br from-primary/10 via-background to-accent/10 py-20">
         <div className="container mx-auto px-4">
@@ -215,7 +218,7 @@ export default function ContactPage() {
                       <div className="space-y-4">
                         {cartItems.map((item, index) => (
                           <div key={item.id} className="flex gap-4 pb-4 border-b last:border-0 last:pb-0">
-                            <div className="relative w-24 h-24 rounded-lg overflow-hidden bg-muted flex-shrink-0 border">
+                            <div className="relative w-24 h-24 rounded-lg overflow-hidden bg-muted shrink-0 border">
                               <Image
                                 src={item.product?.image_url || "/placeholder.svg"}
                                 alt={item.product?.name || "Product"}
@@ -228,7 +231,7 @@ export default function ContactPage() {
                                 <h3 className="font-semibold text-lg">
                                   {index + 1}. {item.product?.name}
                                 </h3>
-                                <div className="text-right flex-shrink-0">
+                                <div className="text-right shrink-0">
                                   <p className="text-xs text-muted-foreground">Unit Price</p>
                                   <p className="font-semibold">${(item.product?.price || 0).toFixed(2)}</p>
                                 </div>
