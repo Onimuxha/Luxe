@@ -1,3 +1,4 @@
+import { Metadata } from "next"
 import { Suspense } from "react"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
@@ -5,7 +6,7 @@ import { ProductGrid } from "@/components/product-grid"
 import { ProductFilters } from "@/components/product-filters"
 import { Skeleton } from "@/components/ui/skeleton"
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Shop All Products | LuxeAccessories",
   description: "Browse our complete collection of premium accessories",
 }
@@ -28,7 +29,7 @@ export default async function ShopPage({
           </div>
 
           <div className="flex flex-col md:flex-row gap-8">
-            <aside className="w-full md:w-64 flex-shrink-0">
+            <aside className="w-full md:w-64 shrink-0">
               <ProductFilters />
             </aside>
 
