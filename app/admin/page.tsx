@@ -30,7 +30,7 @@ export default async function AdminPage() {
       .select("*")
       .order("created_at", { ascending: false })
       .limit(10),
-    supabase.from("products").select("*").limit(10),
+    supabase.from("products").select("*").limit(100),
     supabase.from("orders").select("*", { count: "exact", head: true }),
     supabase.from("products").select("*", { count: "exact", head: true }),
   ]);

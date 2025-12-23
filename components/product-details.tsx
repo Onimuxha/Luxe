@@ -1,34 +1,35 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Image from "next/image"
-import Link from "next/link"
-import { Star, Minus, Plus, ShoppingCart, Heart, Share2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
-import type { Product } from "@/lib/types"
-import { useToast } from "@/hooks/use-toast"
-import { useRouter } from "next/navigation"
+import { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { Star, Minus, Plus, ShoppingCart, Heart, Share2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import type { Product } from "@/lib/types";
+import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 
 interface ProductDetailsProps {
-  product: Product & { category?: { name: string; slug: string } }
+  product: Product & { category?: { name: string; slug: string } };
 }
 
 export function ProductDetails({ product }: ProductDetailsProps) {
-  const [quantity, setQuantity] = useState(1)
-  const [selectedImage, setSelectedImage] = useState(0)
-  const { toast } = useToast()
-  const router = useRouter()
+  const [quantity, setQuantity] = useState(1);
+  const [selectedImage, setSelectedImage] = useState(0);
+  const { toast } = useToast();
+  const router = useRouter();
 
-  const images = [product.image_url, ...product.additional_images]
+  const images = [product.image_url, ...product.additional_images];
 
   const handleAddToCart = async () => {
     try {
       // Generate a user ID from browser fingerprint
-      const userId = localStorage.getItem("cart_user_id") || crypto.randomUUID()
-      localStorage.setItem("cart_user_id", userId)
+      const userId =
+        localStorage.getItem("cart_user_id") || crypto.randomUUID();
+      localStorage.setItem("cart_user_id", userId);
 
       const response = await fetch("/api/cart", {
         method: "POST",
@@ -38,24 +39,24 @@ export function ProductDetails({ product }: ProductDetailsProps) {
           product_id: product.id,
           quantity,
         }),
-      })
+      });
 
-      if (!response.ok) throw new Error("Failed to add to cart")
+      if (!response.ok) throw new Error("Failed to add to cart");
 
       toast({
         title: "Added to cart",
         description: `${product.name} has been added to your cart.`,
-      })
+      });
 
-      router.refresh()
+      router.refresh();
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to add item to cart. Please try again.",
         variant: "destructive",
-      })
+      });
     }
-  }
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -71,7 +72,10 @@ export function ProductDetails({ product }: ProductDetailsProps) {
         {product.category && (
           <>
             <span className="mx-2">/</span>
-            <Link href={`/categories/${product.category.slug}`} className="hover:text-foreground">
+            <Link
+              href={`/categories/${product.category.slug}`}
+              className="hover:text-foreground"
+            >
               {product.category.name}
             </Link>
           </>
@@ -87,7 +91,11 @@ export function ProductDetails({ product }: ProductDetailsProps) {
             <CardContent className="p-0">
               <div className="relative aspect-square">
                 <Image
-                  src={images[selectedImage] || "/placeholder.svg"}
+                  src={
+                    images[selectedImage]
+                      ? `/images/${images[selectedImage]}`
+                      : "/placeholder.svg"
+                  }
                   alt={product.name}
                   fill
                   className="object-cover"
@@ -102,7 +110,9 @@ export function ProductDetails({ product }: ProductDetailsProps) {
                   key={index}
                   onClick={() => setSelectedImage(index)}
                   className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-colors ${
-                    selectedImage === index ? "border-primary" : "border-transparent hover:border-border"
+                    selectedImage === index
+                      ? "border-primary"
+                      : "border-transparent hover:border-border"
                   }`}
                 >
                   <Image
@@ -120,22 +130,35 @@ export function ProductDetails({ product }: ProductDetailsProps) {
         {/* Details */}
         <div className="space-y-6">
           <div>
-            {product.compare_at_price && <Badge className="mb-2 bg-secondary text-secondary-foreground">Sale</Badge>}
-            <h1 className="text-3xl md:text-4xl font-bold mb-2">{product.name}</h1>
+            {product.compare_at_price && (
+              <Badge className="mb-2 bg-secondary text-secondary-foreground">
+                Sale
+              </Badge>
+            )}
+            <h1 className="text-3xl md:text-4xl font-bold mb-2">
+              {product.name}
+            </h1>
             <div className="flex items-center gap-4 mb-4">
               <div className="flex items-center gap-2">
                 <div className="flex">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-5 w-5 fill-secondary text-secondary" />
+                    <Star
+                      key={i}
+                      className="h-5 w-5 fill-secondary text-secondary"
+                    />
                   ))}
                 </div>
-                <span className="text-sm text-muted-foreground">(4.8 / 127 reviews)</span>
+                <span className="text-sm text-muted-foreground">
+                  (4.8 / 127 reviews)
+                </span>
               </div>
             </div>
             <div className="flex items-center gap-4">
               <span className="text-4xl font-bold">${product.price}</span>
               {product.compare_at_price && (
-                <span className="text-xl text-muted-foreground line-through">${product.compare_at_price}</span>
+                <span className="text-xl text-muted-foreground line-through">
+                  ${product.compare_at_price}
+                </span>
               )}
             </div>
           </div>
@@ -143,7 +166,9 @@ export function ProductDetails({ product }: ProductDetailsProps) {
           <Separator />
 
           <div>
-            <p className="text-muted-foreground leading-relaxed">{product.description}</p>
+            <p className="text-muted-foreground leading-relaxed">
+              {product.description}
+            </p>
           </div>
 
           <Separator />
@@ -162,24 +187,35 @@ export function ProductDetails({ product }: ProductDetailsProps) {
                   >
                     <Minus className="h-4 w-4" />
                   </Button>
-                  <span className="px-4 py-2 min-w-[3rem] text-center">{quantity}</span>
+                  <span className="px-4 py-2 min-w-[3rem] text-center">
+                    {quantity}
+                  </span>
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
+                    onClick={() =>
+                      setQuantity(Math.min(product.stock, quantity + 1))
+                    }
                     disabled={quantity >= product.stock}
                   >
                     <Plus className="h-4 w-4" />
                   </Button>
                 </div>
                 <span className="text-sm text-muted-foreground">
-                  {product.stock > 0 ? `${product.stock} available` : "Out of stock"}
+                  {product.stock > 0
+                    ? `${product.stock} available`
+                    : "Out of stock"}
                 </span>
               </div>
             </div>
 
             <div className="flex gap-4">
-              <Button size="lg" className="flex-1" onClick={handleAddToCart} disabled={product.stock === 0}>
+              <Button
+                size="lg"
+                className="flex-1"
+                onClick={handleAddToCart}
+                disabled={product.stock === 0}
+              >
                 <ShoppingCart className="mr-2 h-5 w-5" />
                 Add to Cart
               </Button>
@@ -196,15 +232,23 @@ export function ProductDetails({ product }: ProductDetailsProps) {
             <CardContent className="p-6 space-y-2">
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">SKU:</span>
-                <span className="font-medium">{product.id.slice(0, 8).toUpperCase()}</span>
+                <span className="font-medium">
+                  {product.id.slice(0, 8).toUpperCase()}
+                </span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Category:</span>
-                <span className="font-medium">{product.category?.name || "Uncategorized"}</span>
+                <span className="font-medium">
+                  {product.category?.name || "Uncategorized"}
+                </span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Availability:</span>
-                <span className={`font-medium ${product.stock > 0 ? "text-green-600" : "text-destructive"}`}>
+                <span
+                  className={`font-medium ${
+                    product.stock > 0 ? "text-green-600" : "text-destructive"
+                  }`}
+                >
                   {product.stock > 0 ? "In Stock" : "Out of Stock"}
                 </span>
               </div>
@@ -213,5 +257,5 @@ export function ProductDetails({ product }: ProductDetailsProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }
