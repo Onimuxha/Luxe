@@ -133,7 +133,7 @@ export function CartContent() {
                     </Button>
                   </div>
                   <div className="flex items-center gap-4 mt-4">
-                    <div className="flex items-center border border-border rounded-lg">
+                    <div className="flex items-center border border-border rounded-lg px-0.5">
                       <Button
                         variant="ghost"
                         size="icon"
@@ -168,13 +168,13 @@ export function CartContent() {
 
             <div className="space-y-2 mb-4">
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Subtotal</span>
+                <h6 className="text-muted-foreground">Subtotal</h6>
                 <h6 className="font-medium">${subtotal.toFixed(2)}</h6>
               </div>
             </div>
             <Separator className="my-4" />
             <div className="flex justify-between text-lg font-bold mb-6">
-              <span>Total</span>
+              <h6>Total</h6>
               <h6>${subtotal.toFixed(2)}</h6>
             </div>
             <div className="flex gap-3">

@@ -17,7 +17,7 @@ export default async function SuccessPage({ searchParams }: { searchParams: Prom
   return (
     <>
       <SiteHeader />
-      <main className="flex-1">
+      <main className="flex-1 pt-16">
         <div className="container mx-auto px-4 py-16">
           <div className="max-w-md mx-auto text-center">
             <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-green-600">

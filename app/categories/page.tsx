@@ -18,9 +18,9 @@ export default async function CategoriesPage() {
   const { data: categories } = await supabase.from("categories").select("*")
 
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       <SiteHeader />
-      <main className="flex-1">
+      <main className="flex-1 pt-16">
         <div className="container mx-auto px-4 py-8">
           <div className="mb-8">
             <h1 className="text-3xl md:text-4xl font-bold mb-2">Shop by Category</h1>
@@ -54,6 +54,6 @@ export default async function CategoriesPage() {
         </div>
       </main>
       <SiteFooter />
-    </>
+    </div>
   )
 }

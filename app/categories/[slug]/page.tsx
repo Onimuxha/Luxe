@@ -37,7 +37,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
   return (
     <>
       <SiteHeader />
-      <main className="flex-1">
+      <main className="flex-1 pt-16">
         <div className="container mx-auto px-4 py-8">
           <div className="mb-8">
             <h1 className="text-3xl md:text-4xl font-bold mb-2">{category.name}</h1>
