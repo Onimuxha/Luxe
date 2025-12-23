@@ -11,7 +11,7 @@ import { motion } from "framer-motion"
 import { SearchBar } from "./SearchBar"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 import { SheetTitle } from "@/components/ui/sheet"
-import { IconMoon, IconShoppingCart, IconSun, IconHome, IconCategory2, IconMessage, IconMenu } from "@tabler/icons-react"
+import { IconMoon, IconShoppingCart, IconSun, IconHome, IconCategory2, IconMessage, IconMenuDeep } from "@tabler/icons-react"
 
 interface SiteHeaderProps {
   cartCount?: number
@@ -30,9 +30,25 @@ export function SiteHeader({ cartCount = 0 }: SiteHeaderProps) {
     { name: "Categories", href: "/categories", icon: IconCategory2 },
     { name: "Contact", href: "/contact", icon: IconMessage },
   ]
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10)
+    }
+
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
+
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-gray-200/50 bg-white/90 backdrop-blur-lg shadow-sm supports-filter:bg-white/70 dark:bg-gray-900/90 dark:border-gray-700/50">
+    <header
+      className={`fixed top-2 inset-x-16 rounded-2xl z-50 w-auto transition-all duration-300 backdrop-blur-lg ${scrolled
+          ? "bg-white/70 dark:bg-gray-900/70 border-b border-gray-200/50 dark:border-gray-700/50 shadow-sm"
+          : "bg-transparent top-4 border-none shadow-none"
+        }`}
+    >
       <div className="container mx-auto px-4">
         <div className="flex h-20 items-center justify-between">
 
@@ -107,7 +123,7 @@ export function SiteHeader({ cartCount = 0 }: SiteHeaderProps) {
             <Sheet>
               <SheetTrigger asChild className="md:hidden">
                 <Button variant="ghost" size="icon" aria-label="Menu">
-                  <IconMenu className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+                  <IconMenuDeep className="h-5 w-5 text-gray-600 dark:text-gray-300" />
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-70 sm:w-90 p-6">

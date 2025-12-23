@@ -1,8 +1,9 @@
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { CheckoutForm } from "@/components/checkout-form"
+import { Metadata } from "next"
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Checkout | LuxeAccessories",
   description: "Complete your order",
 }

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -31,6 +31,15 @@ export function ProductDetails({ product }: ProductDetailsProps) {
   const router = useRouter();
 
   const images = [product.image_url, ...product.additional_images];
+
+  const [shareOpen, setShareOpen] = useState(false)
+  const [currentUrl, setCurrentUrl] = useState("")
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setCurrentUrl(window.location.href)
+    }
+  }, [])
 
   const handleAddToCart = async () => {
     try {
@@ -91,7 +100,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
       <div className="grid gap-12 lg:grid-cols-2">
         {/* Image Gallery */}
         <div className="space-y-4">
-          <Card className="overflow-hidden shadow-lg">
+          <Card className="overflow-hidden shadow-lg rounded-4xl">
             <CardContent className="p-0">
               <div className="relative aspect-square bg-muted">
                 <Image
@@ -103,7 +112,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
                   alt={product.name}
                   fill
                   priority
-                  className="object-cover"
+                  className="object-cover rounded-4xl"
                 />
               </div>
             </CardContent>
@@ -114,9 +123,9 @@ export function ProductDetails({ product }: ProductDetailsProps) {
                 <button
                   key={index}
                   onClick={() => setSelectedImage(index)}
-                  className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-colors ${selectedImage === index
-                      ? "border-primary"
-                      : "border-transparent hover:border-border"
+                  className={`relative aspect-square rounded-3xl overflow-hidden border-2 transition-colors ${selectedImage === index
+                    ? "border-primary"
+                    : "border-transparent hover:border-border"
                     }`}
                 >
                   <Image
@@ -128,7 +137,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
                     alt={product.name}
                     fill
                     priority
-                    className="object-cover"
+                    className="object-cover rounded-3xl"
                   />
                 </button>
               ))}
@@ -165,11 +174,11 @@ export function ProductDetails({ product }: ProductDetailsProps) {
             </div>
 
             <div className="flex items-end gap-4">
-              <span className="text-4xl font-bold">${product.price}</span>
+              <h6 className="text-4xl font-bold">${product.price}</h6>
               {product.compare_at_price && (
-                <span className="text-xl text-muted-foreground line-through">
+                <h6 className="text-xl text-muted-foreground line-through">
                   ${product.compare_at_price}
-                </span>
+                </h6>
               )}
             </div>
           </div>
@@ -237,9 +246,10 @@ export function ProductDetails({ product }: ProductDetailsProps) {
             <Button size="lg" variant="outline">
               <IconHeart className="h-5 w-5" />
             </Button>
-            <Button size="lg" variant="outline">
+            <Button variant="outline" size="lg" onClick={() => setShareOpen(true)}>
               <IconShare className="h-5 w-5" />
             </Button>
+            <ShareModal url={currentUrl} open={shareOpen} onOpenChange={setShareOpen} />
           </div>
         </div>
 

@@ -39,7 +39,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   return (
     <>
       <SiteHeader />
-      <main className="flex-1">
+      <main className="flex-1  pt-16">
         <ProductDetails product={product} />
       </main>
       <SiteFooter />

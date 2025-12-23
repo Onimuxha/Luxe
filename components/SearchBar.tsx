@@ -71,7 +71,7 @@ export function SearchBar() {
           placeholder="Search for products..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="flex-1 rounded-lg border-gray-300 dark:border-gray-700 shadow-sm focus:ring-2 focus:ring-primary focus:border-primary transition-all"
+          className="flex-1 rounded-lg border-gray-300 dark:border-gray-500/50 focus:ring-2  transition-all"
         />
         <Button
           className="p-2 rounded-lg bg-primary hover:bg-primary-dark text-white shadow-md transition-colors"
