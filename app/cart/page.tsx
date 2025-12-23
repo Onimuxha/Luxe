@@ -1,8 +1,9 @@
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { CartContent } from "@/components/cart-content"
+import { Metadata } from "next"
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Shopping Cart | LuxeAccessories",
   description: "View your shopping cart",
 }

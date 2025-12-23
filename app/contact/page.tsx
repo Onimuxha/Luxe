@@ -78,21 +78,22 @@ export default function ContactPage() {
     try {
       if (orderMode && cartItems.length > 0) {
         // Order submission with cart items
-        const userId = localStorage.getItem("cart_user_id")
         const total = cartItems.reduce((sum, item) => sum + (item.product?.price || 0) * item.quantity, 0)
 
         const response = await fetch("/api/contact-order", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            userId,
             customer: formData,
             total,
             items: cartItems.map((item) => ({
+              id: item.product?.id,                    // ✅ ADD THIS
               product_name: item.product?.name || "",
               quantity: item.quantity,
               price: item.product?.price || 0,
+              image_url: item.product?.image_url || "", // ✅ ADD THIS
             })),
+            isOrder: true,  // ✅ ADD THIS - tells API it's an order
           }),
         })
 
@@ -112,10 +113,13 @@ export default function ContactPage() {
         router.push("/")
       } else {
         // Regular contact form submission
-        const response = await fetch("/api/contact-message", {
+        const response = await fetch("/api/contact-order", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
+          body: JSON.stringify({
+            customer: formData,
+            isOrder: false,  // ✅ ADD THIS - tells API it's just a message
+          }),
         })
 
         if (!response.ok) throw new Error("Failed to send message")

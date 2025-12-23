@@ -114,16 +114,20 @@ export function ProductDetails({ product }: ProductDetailsProps) {
                 <button
                   key={index}
                   onClick={() => setSelectedImage(index)}
-                  className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-colors ${
-                    selectedImage === index
+                  className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-colors ${selectedImage === index
                       ? "border-primary"
                       : "border-transparent hover:border-border"
-                  }`}
+                    }`}
                 >
                   <Image
-                    src={image || "/placeholder.svg"}
-                    alt={`${product.name} ${index + 1}`}
+                    src={
+                      images[selectedImage]
+                        ? `/images/${images[selectedImage]}`
+                        : "/placeholder.svg"
+                    }
+                    alt={product.name}
                     fill
+                    priority
                     className="object-cover"
                   />
                 </button>
@@ -185,7 +189,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
             <div>
               <label className="text-sm font-medium mb-2 block">Quantity</label>
               <div className="flex items-center gap-4">
-                <div className="flex items-center border border-border rounded-lg">
+                <div className="flex items-center border border-border rounded-lg px-0.5">
                   <Button
                     variant="ghost"
                     size="icon"
@@ -220,52 +224,51 @@ export function ProductDetails({ product }: ProductDetailsProps) {
             </div>
           </div>
 
-            <div className="flex gap-4">
-              <Button
-                size="lg"
-                className="flex-1"
-                onClick={handleAddToCart}
-                disabled={product.stock === 0}
-              >
-                <IconShoppingCart className="mr-2 h-5 w-5" />
-                Add to Cart
-              </Button>
-              <Button size="lg" variant="outline">
-                <IconHeart className="h-5 w-5" />
-              </Button>
-              <Button size="lg" variant="outline">
-                <IconShare className="h-5 w-5" />
-              </Button>
-            </div>
+          <div className="flex gap-4">
+            <Button
+              size="lg"
+              className="flex-1"
+              onClick={handleAddToCart}
+              disabled={product.stock === 0}
+            >
+              <IconShoppingCart className="mr-2 h-5 w-5" />
+              Add to Cart
+            </Button>
+            <Button size="lg" variant="outline">
+              <IconHeart className="h-5 w-5" />
+            </Button>
+            <Button size="lg" variant="outline">
+              <IconShare className="h-5 w-5" />
+            </Button>
           </div>
-
-          <Card>
-            <CardContent className="p-6 space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">SKU:</span>
-                <span className="font-medium">
-                  {product.id.slice(0, 8).toUpperCase()}
-                </span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Category:</span>
-                <span className="font-medium">
-                  {product.category?.name || "Uncategorized"}
-                </span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Availability:</span>
-                <span
-                  className={`font-medium ${
-                    product.stock > 0 ? "text-green-600" : "text-destructive"
-                  }`}
-                >
-                  {product.stock > 0 ? "In Stock" : "Out of Stock"}
-                </span>
-              </div>
-            </CardContent>
-          </Card>
         </div>
+
+        <Card>
+          <CardContent className="p-6 space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">SKU:</span>
+              <span className="font-medium">
+                {product.id.slice(0, 8).toUpperCase()}
+              </span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Category:</span>
+              <span className="font-medium">
+                {product.category?.name || "Uncategorized"}
+              </span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Availability:</span>
+              <span
+                className={`font-medium ${product.stock > 0 ? "text-green-600" : "text-destructive"
+                  }`}
+              >
+                {product.stock > 0 ? "In Stock" : "Out of Stock"}
+              </span>
+            </div>
+          </CardContent>
+        </Card>
       </div>
+    </div>
   );
 }
