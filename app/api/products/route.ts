@@ -10,22 +10,34 @@ export async function POST(request: Request) {
     const supabase = await createClient();
     const formData = await request.formData();
 
-    const image = formData.get("image") as File | null;
+    const images = formData.getAll("images") as File[];
     let imageName: string | null = null;
+    const additionalImages: string[] = [];
 
-    if (image) {
-      const bytes = await image.arrayBuffer();
-      const buffer = Buffer.from(bytes);
-      
-      // Convert to WebP
-      const webpBuffer = await sharp(buffer).webp({ quality: 80 }).toBuffer();
-      
+    if (images.length > 0) {
       const uploadDir = path.join(process.cwd(), "public", "images");
       if (!fs.existsSync(uploadDir))
         fs.mkdirSync(uploadDir, { recursive: true });
-      
-      imageName = `${randomUUID()}.webp`;
-      fs.writeFileSync(path.join(uploadDir, imageName), webpBuffer);
+
+      // Process all images
+      for (let i = 0; i < images.length; i++) {
+        const image = images[i];
+        const bytes = await image.arrayBuffer();
+        const buffer = Buffer.from(bytes);
+        
+        // Convert to WebP
+        const webpBuffer = await sharp(buffer).webp({ quality: 80 }).toBuffer();
+        
+        const fileName = `${randomUUID()}.webp`;
+        fs.writeFileSync(path.join(uploadDir, fileName), webpBuffer);
+
+        // First image is main image
+        if (i === 0) {
+          imageName = fileName;
+        } else {
+          additionalImages.push(fileName);
+        }
+      }
     }
 
     const product = {
@@ -38,9 +50,7 @@ export async function POST(request: Request) {
         : null,
       category_id: formData.get("category_id") || null,
       image_url: imageName,
-      additional_images: JSON.parse(
-        (formData.get("additional_images") as string) || "[]"
-      ),
+      additional_images: additionalImages.length > 0 ? additionalImages : null,
       stock: Number(formData.get("stock")),
       is_active: formData.get("is_active") === "true",
     };
