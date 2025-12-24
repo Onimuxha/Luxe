@@ -31,25 +31,51 @@ export async function PUT(
         ? Number(formData.get("compare_at_price"))
         : null,
       category_id: formData.get("category_id") || null,
-      additional_images: JSON.parse((formData.get("additional_images") as string) || "[]"),
       stock: Number(formData.get("stock")),
       is_active: formData.get("is_active") === "true",
     }
 
-    // Optional image upload
-    const image = formData.get("image") as File | null
-    if (image) {
-      const buffer = Buffer.from(await image.arrayBuffer())
-      // Convert to WebP
-      const webpBuffer = await sharp(buffer).webp({ quality: 80 }).toBuffer()
-
+    // Handle multiple image uploads or preserve existing images
+    const images = formData.getAll("images") as File[]
+    const existingImagesJson = formData.get("existingImages") as string | null
+    const additionalImages: string[] = []
+    
+    if (images.length > 0) {
+      // User uploaded new images, replace all
       const uploadDir = path.join(process.cwd(), "public", "images")
       if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true })
 
-      const imageName = `${randomUUID()}.webp`
-      fs.writeFileSync(path.join(uploadDir, imageName), webpBuffer)
+      // Process all images
+      for (let i = 0; i < images.length; i++) {
+        const image = images[i];
+        const buffer = Buffer.from(await image.arrayBuffer())
+        // Convert to WebP
+        const webpBuffer = await sharp(buffer).webp({ quality: 80 }).toBuffer()
 
-      updateData.image_url = imageName
+        const fileName = `${randomUUID()}.webp`
+        fs.writeFileSync(path.join(uploadDir, fileName), webpBuffer)
+
+        // First image is main image
+        if (i === 0) {
+          updateData.image_url = fileName
+        } else {
+          additionalImages.push(fileName)
+        }
+      }
+
+      // Only update additional_images if we have them
+      if (additionalImages.length > 0) {
+        updateData.additional_images = additionalImages
+      }
+    } else if (existingImagesJson) {
+      // No new images, preserve existing ones
+      const existingImages = JSON.parse(existingImagesJson) as string[]
+      if (existingImages.length > 0) {
+        updateData.image_url = existingImages[0]
+        if (existingImages.length > 1) {
+          updateData.additional_images = existingImages.slice(1)
+        }
+      }
     }
 
     // Update product in Supabase

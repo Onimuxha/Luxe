@@ -121,7 +121,7 @@ export function ProductsTable({ products }: ProductsTableProps) {
                   <TableRow key={product.id}>
                     <TableCell>
                       <div className="flex items-center gap-3">
-                        <div className="relative h-10 w-10 rounded-md overflow-hidden">
+                        <div className="relative h-10 w-10 rounded-md overflow-hidden bg-muted">
                           <Image
                             src={
                               product.image_url
@@ -133,11 +133,16 @@ export function ProductsTable({ products }: ProductsTableProps) {
                             className="object-cover"
                           />
                         </div>
-                        <div>
+                        <div className="flex-1">
                           <h6 className="font-medium">{product.name}</h6>
-                          <div className="text-sm text-muted-foreground">
+                          <div className="text-xs text-muted-foreground">
                             {product.slug}
                           </div>
+                          {product.additional_images && product.additional_images.length > 0 && (
+                            <div className="text-xs text-muted-foreground mt-1">
+                              +{product.additional_images.length} more image{product.additional_images.length > 1 ? 's' : ''}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </TableCell>

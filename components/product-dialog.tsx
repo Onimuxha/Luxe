@@ -41,6 +41,7 @@ export function ProductDialog({
   const [categories, setCategories] = useState<
     { id: string; name: string; slug: string }[]
   >([])
+  const [existingImages, setExistingImages] = useState<string[]>([])
 
   const [formData, setFormData] = useState({
     name: "",
@@ -49,8 +50,7 @@ export function ProductDialog({
     price: "",
     compare_at_price: "",
     category_id: "",
-    image_file: null as File | null, // ✅ FILE
-    additional_images: "",
+    image_files: [] as File[], // ✅ Multiple FILES
     stock: "",
     is_active: true,
   })
@@ -73,13 +73,21 @@ export function ProductDialog({
         price: "",
         compare_at_price: "",
         category_id: "",
-        image_file: null,
-        additional_images: "",
+        image_files: [],
         stock: "",
         is_active: true,
       })
+      setExistingImages([])
       return
     }
+
+    // Collect all existing images
+    const allImages: string[] = []
+    if (product.image_url) allImages.push(product.image_url)
+    if (product.additional_images && Array.isArray(product.additional_images)) {
+      allImages.push(...product.additional_images)
+    }
+    setExistingImages(allImages)
 
     setFormData({
       name: product.name,
@@ -90,8 +98,7 @@ export function ProductDialog({
         ? String(product.compare_at_price)
         : "",
       category_id: product.category_id ?? "",
-      image_file: null, // 👈 keep existing image unless replaced
-      additional_images: product.additional_images?.join(", ") ?? "",
+      image_files: [],
       stock: String(product.stock),
       is_active: product.is_active,
     })
@@ -129,30 +136,25 @@ export function ProductDialog({
       form.append("stock", formData.stock)
       form.append("is_active", String(formData.is_active))
 
-      if (formData.image_file) {
-        form.append("image", formData.image_file) // ✅ FILE
+      // Handle multiple images
+      if (formData.image_files.length > 0) {
+        // User uploaded new images
+        formData.image_files.forEach((file) => {
+          form.append("images", file)
+        })
+      } else if (existingImages.length > 0 && product) {
+        // User didn't upload new images, preserve existing ones
+        form.append("existingImages", JSON.stringify(existingImages))
       }
-
-      const additional_images =
-        formData.additional_images
-          ?.split(",")
-          .map((img) => img.trim())
-          .filter(Boolean) ?? []
-
-      form.append(
-        "additional_images",
-        JSON.stringify(additional_images)
-      )
 
       const url = product ? `/api/products/${product.id}` : "/api/products"
       const method = product ? "PUT" : "POST"
       
       console.log("Submitting to:", url, "Method:", method)
-      console.log("Form data:", Object.fromEntries(form))
 
       const response = await fetch(url, {
         method: method,
-        body: form, // ❌ no Content-Type
+        body: form,
       })
 
       const responseText = await response.text()
@@ -279,32 +281,98 @@ export function ProductDialog({
             </SelectContent>
           </Select>
 
-          {/* ✅ FILE INPUT */}
+          {/* ✅ MULTIPLE IMAGE INPUT */}
           <div className="space-y-2">
-            <Label>Main Image</Label>
+            <Label>Product Images</Label>
             <Input
               type="file"
               accept="image/*"
-              onChange={(e) =>
+              multiple
+              onChange={(e) => {
+                const files = Array.from(e.target.files || [])
                 setFormData({
                   ...formData,
-                  image_file: e.target.files?.[0] || null,
+                  image_files: files,
                 })
-              }
+              }}
             />
+            <p className="text-xs text-muted-foreground">
+              Upload one or more images. First image will be the main product image.
+            </p>
           </div>
 
-          <Textarea
-            placeholder="Additional image URLs (comma separated)"
-            value={formData.additional_images}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                additional_images: e.target.value,
-              })
-            }
-            rows={2}
-          />
+          {/* Existing Images Preview */}
+          {existingImages.length > 0 && formData.image_files.length === 0 && (
+            <div className="space-y-2">
+              <Label>Current Images</Label>
+              <div className="grid grid-cols-4 gap-2">
+                {existingImages.map((imgUrl, index) => (
+                  <div key={index} className="relative group">
+                    <img
+                      src={`/images/${imgUrl}`}
+                      alt={`Existing ${index}`}
+                      className="w-full h-20 object-cover rounded-md border"
+                    />
+                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 rounded-md flex items-center justify-center transition-opacity">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newImages = existingImages.filter((_, i) => i !== index)
+                          setExistingImages(newImages)
+                        }}
+                        className="text-white text-xs bg-red-500 px-2 py-1 rounded"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                    {index === 0 && (
+                      <div className="absolute top-1 left-1 bg-blue-500 text-white text-xs px-2 py-1 rounded">
+                        Main
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Upload new images to replace these, or click Remove to delete specific images.
+              </p>
+            </div>
+          )}
+
+          {/* New Images Preview */}
+          {formData.image_files.length > 0 && (
+            <div className="space-y-2">
+              <Label>New Images to Upload</Label>
+              <div className="grid grid-cols-4 gap-2">
+                {formData.image_files.map((file, index) => (
+                  <div key={index} className="relative group">
+                    <img
+                      src={URL.createObjectURL(file)}
+                      alt={`Preview ${index}`}
+                      className="w-full h-20 object-cover rounded-md border"
+                    />
+                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 rounded-md flex items-center justify-center transition-opacity">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newFiles = formData.image_files.filter((_, i) => i !== index)
+                          setFormData({ ...formData, image_files: newFiles })
+                        }}
+                        className="text-white text-xs bg-red-500 px-2 py-1 rounded"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                    {index === 0 && (
+                      <div className="absolute top-1 left-1 bg-blue-500 text-white text-xs px-2 py-1 rounded">
+                        Main
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="flex items-center space-x-2">
             <Switch
