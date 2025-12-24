@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -10,7 +10,7 @@ import { Separator } from "@/components/ui/separator"
 import type { Product } from "@/lib/types"
 import { useToast } from "@/hooks/use-toast"
 import { useRouter } from "next/navigation"
-import { IconHeart, IconMinus, IconPlus, IconShare, IconShoppingCart, IconStar } from "@tabler/icons-react"
+import { IconHeart, IconMinus, IconPlus, IconShare, IconShoppingCart, IconStar, IconChevronLeft, IconChevronRight } from "@tabler/icons-react"
 import { ShareModal } from "./ShareModal"
 import { ProductRow } from "@/components/ProductRow"
 
@@ -26,6 +26,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
   const [shareOpen, setShareOpen] = useState(false)
   const [currentUrl, setCurrentUrl] = useState("")
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([])
+  const thumbsRef = useRef<HTMLDivElement>(null)
 
   const images = [product.image_url, ...(product.additional_images || [])]
 
@@ -83,7 +84,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
       <div className="grid gap-12 lg:grid-cols-2">
         {/* Image Gallery */}
         <div className="space-y-4">
-          <Card className="overflow-hidden shadow-lg rounded-4xl">
+          <Card className="overflow-hidden h-2xl w-2xl shadow-lg rounded-4xl">
             <CardContent className="p-0">
               <div className="relative aspect-square bg-muted">
                 <Image
@@ -98,21 +99,49 @@ export function ProductDetails({ product }: ProductDetailsProps) {
           </Card>
 
           {images.length > 1 && (
-            <div className="grid grid-cols-4 gap-4">
-              {images.map((img, i) => (
+            <div className="relative">
+              <div className="absolute left-1 top-1/2 -translate-y-1/2 z-20 hidden sm:block">
                 <button
-                  key={i}
-                  onClick={() => setSelectedImage(i)}
-                  className={`relative aspect-square rounded-3xl overflow-hidden border-2 transition-colors ${selectedImage === i ? "border-primary" : "border-transparent hover:border-border"}`}
+                  type="button"
+                  onClick={() => thumbsRef.current?.scrollBy({ left: -120, behavior: 'smooth' })}
+                  className="p-2 bg-background/80 hover:bg-background rounded-full shadow"
+                  aria-label="Scroll left"
                 >
-                  <Image
-                    src={img ? `/images/${encodeURIComponent(img)}` : "/placeholder.svg"}
-                    alt={product.name}
-                    fill
-                    className="object-cover rounded-3xl"
-                  />
+                  <IconChevronLeft className="h-4 w-4" />
                 </button>
-              ))}
+              </div>
+
+              <div
+                ref={thumbsRef}
+                className="flex gap-4 overflow-x-auto overflow-y-hidden py-2 px-2 no-scrollbar scrollbar-hide"
+                style={{ WebkitOverflowScrolling: 'touch' }}
+              >
+                {images.map((img, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setSelectedImage(i)}
+                    className={`relative min-w-28 w-16 aspect-square rounded-3xl overflow-hidden border-2 transition-colors ${selectedImage === i ? 'border-primary' : 'border-transparent hover:border-border'}`}
+                  >
+                    <Image
+                      src={img ? `/images/${encodeURIComponent(img)}` : "/placeholder.svg"}
+                      alt={product.name}
+                      fill
+                      className="object-cover rounded-xl"
+                    />
+                  </button>
+                ))}
+              </div>
+
+              <div className="absolute right-1 top-1/2 -translate-y-1/2 z-20 hidden sm:block">
+                <button
+                  type="button"
+                  onClick={() => thumbsRef.current?.scrollBy({ left: 120, behavior: 'smooth' })}
+                  className="p-2 bg-background/80 hover:bg-background rounded-full shadow"
+                  aria-label="Scroll right"
+                >
+                  <IconChevronRight className="h-4 w-4" />
+                </button>
+              </div>
             </div>
           )}
         </div>
