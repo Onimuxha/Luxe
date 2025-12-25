@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
+import fs from "fs";
+import path from "path";
+import { randomUUID } from "crypto";
 import { createClient } from "@/lib/supabase/server";
 import sharp from "sharp";
-import { randomUUID } from "crypto";
 
 export async function POST(request: Request) {
   try {
@@ -13,32 +15,21 @@ export async function POST(request: Request) {
     const additionalImages: string[] = [];
 
     if (images.length > 0) {
+      const uploadDir = path.join(process.cwd(), "public", "images");
+      if (!fs.existsSync(uploadDir))
+        fs.mkdirSync(uploadDir, { recursive: true });
+
       // Process all images
       for (let i = 0; i < images.length; i++) {
         const image = images[i];
         const bytes = await image.arrayBuffer();
         const buffer = Buffer.from(bytes);
         
-        // Convert to WebP and compress
-        const webpBuffer = await sharp(buffer)
-          .webp({ quality: 80 })
-          .resize(1200, 1200, { fit: 'inside', withoutEnlargement: true })
-          .toBuffer();
+        // Convert to WebP
+        const webpBuffer = await sharp(buffer).webp({ quality: 80 }).toBuffer();
         
         const fileName = `${randomUUID()}.webp`;
-        
-        // Upload to Supabase Storage
-        const { error: uploadError } = await supabase.storage
-          .from('product-images') // Create this bucket in Supabase
-          .upload(fileName, webpBuffer, {
-            contentType: 'image/webp',
-            cacheControl: '3600',
-          });
-
-        if (uploadError) {
-          console.error('Upload error:', uploadError);
-          throw new Error(`Failed to upload image: ${uploadError.message}`);
-        }
+        fs.writeFileSync(path.join(uploadDir, fileName), webpBuffer);
 
         // First image is main image
         if (i === 0) {
@@ -77,12 +68,13 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error(error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to create product" },
+      { error: "Failed to create product" },
       { status: 500 }
     );
   }
 }
 
+// GET - fetch related products
 export async function GET(request: Request) {
   try {
     const supabase = await createClient();
