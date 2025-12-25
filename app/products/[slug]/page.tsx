@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     }
   }
 
-  const productImageUrl = product.image_url
+  const productImageUrl = product.image_url && !product.image_url.includes("placeholder")
     ? `${process.env.NEXT_PUBLIC_SITE_URL || "https://luxe-roan-three.vercel.app"}/images/${product.image_url}`
     : `${process.env.NEXT_PUBLIC_SITE_URL || "https://luxe-roan-three.vercel.app"}/icon.svg`
 
@@ -36,6 +36,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
           alt: product.name,
         },
       ],
+    },
+    twitter: {
+      card: "summary",
+      title: product.name,
+      description: product.description || `Shop ${product.name} at LuxeAccessories`,
+      images: [productImageUrl],
     },
   }
 }
