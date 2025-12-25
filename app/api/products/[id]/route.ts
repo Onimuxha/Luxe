@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
+import fs from "fs"
+import path from "path"
 import { randomUUID } from "crypto"
 import sharp from "sharp"
 
@@ -9,11 +11,14 @@ export async function PUT(
 ) {
   try {
     const { id } = await params
+    // Check for valid product ID
     if (!id) {
       return NextResponse.json({ error: "Product ID is required" }, { status: 400 })
     }
 
     const supabase = await createClient()
+
+    // Parse incoming form data
     const formData = await req.formData()
 
     // Build update object
@@ -36,45 +41,19 @@ export async function PUT(
     const additionalImages: string[] = []
     
     if (images.length > 0) {
-      // Get old images to delete them
-      const { data: oldProduct } = await supabase
-        .from("products")
-        .select("image_url, additional_images")
-        .eq("id", id)
-        .single()
+      // User uploaded new images, replace all
+      const uploadDir = path.join(process.cwd(), "public", "images")
+      if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true })
 
-      // Delete old images from storage
-      if (oldProduct?.image_url) {
-        await supabase.storage.from('product-images').remove([oldProduct.image_url])
-      }
-      if (oldProduct?.additional_images) {
-        await supabase.storage.from('product-images').remove(oldProduct.additional_images)
-      }
-
-      // Upload new images
+      // Process all images
       for (let i = 0; i < images.length; i++) {
         const image = images[i];
         const buffer = Buffer.from(await image.arrayBuffer())
-        
-        // Convert to WebP and compress
-        const webpBuffer = await sharp(buffer)
-          .webp({ quality: 80 })
-          .resize(1200, 1200, { fit: 'inside', withoutEnlargement: true })
-          .toBuffer()
+        // Convert to WebP
+        const webpBuffer = await sharp(buffer).webp({ quality: 80 }).toBuffer()
 
         const fileName = `${randomUUID()}.webp`
-        
-        // Upload to Supabase Storage
-        const { error: uploadError } = await supabase.storage
-          .from('product-images')
-          .upload(fileName, webpBuffer, {
-            contentType: 'image/webp',
-            cacheControl: '3600',
-          })
-
-        if (uploadError) {
-          throw new Error(`Failed to upload image: ${uploadError.message}`)
-        }
+        fs.writeFileSync(path.join(uploadDir, fileName), webpBuffer)
 
         // First image is main image
         if (i === 0) {
@@ -84,11 +63,9 @@ export async function PUT(
         }
       }
 
-      // Update additional_images
+      // Only update additional_images if we have them
       if (additionalImages.length > 0) {
         updateData.additional_images = additionalImages
-      } else {
-        updateData.additional_images = null
       }
     } else if (existingImagesJson) {
       // No new images, preserve existing ones
@@ -97,8 +74,6 @@ export async function PUT(
         updateData.image_url = existingImages[0]
         if (existingImages.length > 1) {
           updateData.additional_images = existingImages.slice(1)
-        } else {
-          updateData.additional_images = null
         }
       }
     }
@@ -107,7 +82,7 @@ export async function PUT(
     const { error } = await supabase
       .from("products")
       .update(updateData)
-      .eq("id", id)
+      .eq("id", id) // Use awaited id
 
     if (error) {
       console.error("Error updating product:", error)
@@ -117,10 +92,7 @@ export async function PUT(
     return NextResponse.json({ success: true })
   } catch (err) {
     console.error("Failed to update product:", err)
-    return NextResponse.json(
-      { error: err instanceof Error ? err.message : "Failed to update product" },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: "Failed to update product" }, { status: 500 })
   }
 }
 
@@ -137,22 +109,6 @@ export async function DELETE(
 
     const supabase = await createClient()
 
-    // Get product to delete images from storage
-    const { data: product } = await supabase
-      .from("products")
-      .select("image_url, additional_images")
-      .eq("id", id)
-      .single()
-
-    // Delete images from storage
-    if (product?.image_url) {
-      await supabase.storage.from('product-images').remove([product.image_url])
-    }
-    if (product?.additional_images) {
-      await supabase.storage.from('product-images').remove(product.additional_images)
-    }
-
-    // Delete product from database
     const { error } = await supabase
       .from("products")
       .delete()
