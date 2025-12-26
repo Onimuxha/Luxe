@@ -16,21 +16,19 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     }
   }
 
-  let productImageUrl = `${process.env.NEXT_PUBLIC_SITE_URL || "https://luxe-roan-three.vercel.app"}/icon.svg`
+  let productImageUrl = `${process.env.NEXT_PUBLIC_SITE_URL || "https://luxe-roan-three.vercel.app"}/icon.png`
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://luxe-roan-three.vercel.app"
 
   if (product.image_url && !product.image_url.includes("placeholder")) {
-    // Images uploaded to Supabase Storage use this format
+    // Images are stored locally in /images/ folder
     if (product.image_url.startsWith("http")) {
       productImageUrl = product.image_url
     } else {
-      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ""
-      productImageUrl = `${supabaseUrl}/storage/v1/object/public/images/${product.image_url}`
+      // Use the 1080 version for better quality in previews
+      const imageName = product.image_url.replace(/(_1080|_400|_48)?\.webp$/, "_1080.webp")
+      productImageUrl = `${siteUrl}/images/${imageName}`
     }
   }
-
-  const imageExt = productImageUrl.split("?")[0].split(".").pop()?.toLowerCase() || ""
-  const imageType = imageExt === "webp" ? "image/webp" : imageExt === "png" ? "image/png" : imageExt === "jpg" || imageExt === "jpeg" ? "image/jpeg" : "image/*"
 
   const fallbackImage = `${siteUrl}/icon.png`
 
@@ -45,8 +43,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       images: [
         {
           url: productImageUrl,
+          width: 1200,
+          height: 1200,
           alt: product.name,
-          type: imageType,
+          type: "image/webp",
         },
         {
           url: fallbackImage,
