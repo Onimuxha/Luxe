@@ -37,12 +37,18 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/icon.svg",
-        width: 200,
-        height: 200,
+        url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://luxe-roan-three.vercel.app"}/icon.png`,
+        width: 1200,
+        height: 630,
         alt: "LuxeAccessories Logo",
       },
     ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "LuxeAccessories - Premium Watches, Jewelry & More",
+    description: "Discover our curated collection of premium accessories including watches, jewelry, bags, and sunglasses.",
+    images: [`${process.env.NEXT_PUBLIC_SITE_URL || "https://luxe-roan-three.vercel.app"}/icon.png`],
   },
 }
 
