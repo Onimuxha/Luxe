@@ -2,14 +2,14 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { useTheme } from "next-themes"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { OrdersTable } from "@/components/orders-table"
 import { ProductsTable } from "@/components/products-table"
 import type { Order, Product } from "@/lib/types"
-import { IconShoppingCart, IconLogout, IconPackage, IconShoppingBag, IconTrendingUp, IconUsers, IconSun, IconMoon } from "@tabler/icons-react"
+import { IconShoppingCart, IconLogout, IconPackage, IconShoppingBag, IconTrendingUp, IconUsers } from "@tabler/icons-react"
+import { AnimatedThemeToggler } from "@/components/animated-theme-toggler"
 
 interface AdminDashboardProps {
   orders: Order[]
@@ -20,7 +20,6 @@ interface AdminDashboardProps {
 
 export function AdminDashboard({ orders, products, totalOrders, totalProducts }: AdminDashboardProps) {
   const router = useRouter()
-  const { theme, setTheme } = useTheme()
   const [loading, setLoading] = useState(false)
   const [mounted, setMounted] = useState(false)
 
@@ -85,15 +84,7 @@ export function AdminDashboard({ orders, products, totalOrders, totalProducts }:
               <span className="hidden sm:inline">Logout</span>
             </Button>
             {mounted && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                aria-label="Toggle theme"
-                className="rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-              >
-                {theme === "dark" ? <IconSun className="h-5 w-5 text-yellow-400" /> : <IconMoon className="h-5 w-5 text-gray-700 dark:text-gray-300" />}
-              </Button>
+              <AnimatedThemeToggler/>
             )}
           </div>
         </div>
