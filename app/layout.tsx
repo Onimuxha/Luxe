@@ -8,9 +8,10 @@ import "./globals.css"
 
 const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://luxe-roan-three.vercel.app"
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://luxe-roan-three.vercel.app"),
+  metadataBase: new URL(siteUrl),
   title: "LuxeAccessories - Premium Watches, Jewelry & More",
   description:
     "Discover our curated collection of premium accessories including watches, jewelry, bags, and sunglasses. Shop the finest quality products with style.",
@@ -32,12 +33,12 @@ export const metadata: Metadata = {
   openGraph: {
     title: "LuxeAccessories - Premium Watches, Jewelry & More",
     description: "Discover our curated collection of premium accessories including watches, jewelry, bags, and sunglasses.",
-    url: process.env.NEXT_PUBLIC_SITE_URL || "https://luxe-roan-three.vercel.app",
+    url: siteUrl,
     siteName: "LuxeAccessories",
     type: "website",
     images: [
       {
-        url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://luxe-roan-three.vercel.app"}/icon.png`,
+        url: `${siteUrl}/og-image.png`, // Your new OG image
         width: 1200,
         height: 630,
         alt: "LuxeAccessories Logo",
@@ -48,7 +49,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "LuxeAccessories - Premium Watches, Jewelry & More",
     description: "Discover our curated collection of premium accessories including watches, jewelry, bags, and sunglasses.",
-    images: [`${process.env.NEXT_PUBLIC_SITE_URL || "https://luxe-roan-three.vercel.app"}/icon.png`],
+    images: [`${siteUrl}/og-image.png`],
   },
 }
 
