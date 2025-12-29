@@ -4,6 +4,8 @@ import { SiteFooter } from "@/components/site-footer"
 import { ProductDetails } from "@/components/product-details"
 import { createClient } from "@/lib/supabase/server"
 import type { Metadata } from "next"
+import fs from "fs"
+import path from "path"
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
@@ -20,13 +22,23 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://luxe-roan-three.vercel.app"
 
   if (product.image_url && !product.image_url.includes("placeholder")) {
-    // Images are stored locally in /images/ folder
-    if (product.image_url.startsWith("http")) {
+    // Images may be stored externally (full URL) or locally in /public/images
+    if (product.image_url.startsWith("http") || product.image_url.startsWith("https")) {
       productImageUrl = product.image_url
     } else {
-      // Use the 1080 version for better quality in previews
-      const imageName = product.image_url.replace(/(_1080|_400|_48)?\.webp$/, "_1080.webp")
-      productImageUrl = `${siteUrl}/images/${imageName}`
+      // Prefer the _1080 variant when available, otherwise fall back to the original file
+      const image1080 = product.image_url.replace(/(_1080|_400|_48)?\.webp$/, "_1080.webp")
+      const publicPath1080 = path.join(process.cwd(), "public", "images", image1080)
+      const publicPathOriginal = path.join(process.cwd(), "public", "images", product.image_url)
+
+      if (fs.existsSync(publicPath1080)) {
+        productImageUrl = `${siteUrl}/images/${image1080}`
+      } else if (fs.existsSync(publicPathOriginal)) {
+        productImageUrl = `${siteUrl}/images/${product.image_url}`
+      } else {
+        // last resort: use the original value (it may be served from external storage)
+        productImageUrl = `${siteUrl}/images/${image1080}`
+      }
     }
   }
 
@@ -57,7 +69,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       ],
     },
     twitter: {
-      card: "summary_large_image",
+      card: "summary",
       title: product.name,
       description: product.description || `Shop ${product.name} at LuxeAccessories`,
       images: [productImageUrl, fallbackImage],
