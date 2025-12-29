@@ -3,22 +3,21 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { useTheme } from "next-themes"
 import { useState, useEffect } from "react"
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet"
 import { Badge } from "@/components/ui/badge"
 import { motion } from "framer-motion"
 import { SearchBar } from "./SearchBar"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
-import { IconMoon, IconShoppingCart, IconSun, IconHome, IconCategory2, IconMessage, IconMenuDeep, IconPackage } from "@tabler/icons-react"
+import { IconShoppingCart, IconHome, IconCategory2, IconMessage, IconMenuDeep, IconPackage } from "@tabler/icons-react"
 import { useRouter } from "next/navigation"
+import { AnimatedThemeToggler } from "./animated-theme-toggler"
 
 interface SiteHeaderProps {
   cartCount?: number
 }
 
 export function SiteHeader({ cartCount = 0 }: SiteHeaderProps) {
-  const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const pathname = usePathname()
@@ -36,7 +35,7 @@ export function SiteHeader({ cartCount = 0 }: SiteHeaderProps) {
     try {
       const rid = localStorage.getItem("recent_order_id")
       if (rid) setRecentOrderId(rid)
-    } catch {}
+    } catch { }
   }, [])
 
   const navigation = [
@@ -48,15 +47,14 @@ export function SiteHeader({ cartCount = 0 }: SiteHeaderProps) {
 
   return (
     <header
-      className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
-        scrolled
+      className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${scrolled
           ? "bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-lg shadow-black/5"
           : "bg-white/60 dark:bg-transparent backdrop-blur-md"
-      } md:top-4 md:inset-x-4 lg:inset-x-20 xl:inset-x-40 md:rounded-2xl`}
+        } md:top-4 md:inset-x-4 lg:inset-x-20 xl:inset-x-40 md:rounded-2xl`}
     >
       <div className="container mx-auto px-4 sm:px-6">
         <div className="flex h-16 md:h-20 items-center justify-between gap-4">
-          
+
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
             <img src="/icon.svg" alt="Luxe Logo" className="h-8 w-8" />
@@ -95,17 +93,7 @@ export function SiteHeader({ cartCount = 0 }: SiteHeaderProps) {
 
             {/* Theme Toggle */}
             {mounted && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="rounded-full h-9 w-9"
-              >
-                {theme === "dark" ? 
-                  <IconSun className="h-5 w-5 text-yellow-400" /> : 
-                  <IconMoon className="h-5 w-5" />
-                }
-              </Button>
+              <AnimatedThemeToggler />
             )}
 
             {/* Recent Order */}
@@ -126,7 +114,7 @@ export function SiteHeader({ cartCount = 0 }: SiteHeaderProps) {
               <Button variant="ghost" size="icon" className="relative rounded-full h-9 w-9">
                 <IconShoppingCart className="h-5 w-5" />
                 {cartCount > 0 && (
-                  <Badge className="absolute -right-1 -top-1 h-5 w-5 rounded-full bg-red-500 p-0 flex items-center justify-center text-xs border-2 border-white dark:border-gray-900">
+                  <Badge className="absolute -right-1 -top-1 h-5 w-5 rounded-full bg-red-500 p-0 flex items-center justify-center text-xs">
                     {cartCount > 9 ? "9+" : cartCount}
                   </Badge>
                 )}
@@ -144,7 +132,7 @@ export function SiteHeader({ cartCount = 0 }: SiteHeaderProps) {
                 <VisuallyHidden>
                   <SheetTitle>Menu</SheetTitle>
                 </VisuallyHidden>
-                
+
                 {/* Mobile Search */}
                 <div className="lg:hidden mt-6 mb-8">
                   <SearchBar />
@@ -155,17 +143,16 @@ export function SiteHeader({ cartCount = 0 }: SiteHeaderProps) {
                     <Link
                       key={item.name}
                       href={item.href}
-                      className={`flex items-center gap-3 text-base font-medium py-2 transition-colors ${
-                        pathname === item.href
+                      className={`flex items-center gap-3 text-base font-medium py-2 transition-colors ${pathname === item.href
                           ? "text-primary"
                           : "text-gray-700 dark:text-gray-200 hover:text-primary"
-                      }`}
+                        }`}
                     >
                       <item.icon className="h-5 w-5" />
                       {item.name}
                     </Link>
                   ))}
-                  
+
                   {/* Mobile Recent Order Link */}
                   {recentOrderId && (
                     <Link
