@@ -18,18 +18,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     }
   }
 
-  // let productImageUrl = `${process.env.NEXT_PUBLIC_SITE_URL || "https://luxe-roan-three.vercel.app"}/icon.png`
   let productImageUrl: string;
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://luxe-roan-three.vercel.app"
 
-  // In your generateMetadata function, simplify the logic:
 
   if (product.image_url && !product.image_url.includes("placeholder")) {
     if (product.image_url.startsWith("http")) {
-      // External URL
       productImageUrl = product.image_url;
     } else {
-      // Local image - use the _1080 variant
       const imageName = product.image_url.replace(/(_1080|_400|_48)?\.webp$/, "_1080.webp");
       productImageUrl = `${siteUrl}/images/${imageName}`;
     }
@@ -51,14 +47,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         {
           url: productImageUrl,
           width: 1200,
-          height: 630, // Changed from 1200 - better aspect ratio for OG
+          height: 630,
           alt: product.name,
-          // Remove type: "image/webp" - let the platform detect it
         },
       ],
     },
     twitter: {
-      card: "summary_large_image", // Changed from "summary" for better image display
+      card: "summary",
       title: product.name,
       description: product.description || `Shop ${product.name} at LuxeAccessories`,
       images: [productImageUrl],
