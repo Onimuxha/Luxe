@@ -84,23 +84,6 @@ export function ProductsTable({ products }: ProductsTableProps) {
       alert("Failed");
     }
   };
-
-  // const confirmDelete = async () => {
-  //   if (!toDelete) return;
-  //   setDeleting(toDelete.id);
-  //   setDeleteOpen(false);
-  //   try {
-  //     const res = await fetch(`/api/products/${toDelete.id}`, { method: "DELETE" });
-  //     if (res.ok) router.refresh();
-  //     else alert("Failed to delete");
-  //   } catch (e) {
-  //     console.error(e);
-  //     alert("Failed to delete");
-  //   } finally {
-  //     setDeleting(null);
-  //     setToDelete(null);
-  //   }
-  // };
   const confirmDelete = async () => {
     if (!toDelete) return;
     setDeleting(toDelete.id);

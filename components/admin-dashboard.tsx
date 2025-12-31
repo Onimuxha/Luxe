@@ -62,8 +62,6 @@ export function AdminDashboard({ orders, products, totalOrders, totalProducts }:
               <img src="/icon.svg" alt="" />
             </div>
             <h1 className="font-bold text-lg">Admin Dashboard</h1>
-          </div>
-          <div className="flex items-center gap-2 flex-wrap">
             <Button
               variant="outline"
               size="sm"
@@ -73,7 +71,8 @@ export function AdminDashboard({ orders, products, totalOrders, totalProducts }:
               <IconShoppingCart className="h-4 w-4 sm:mr-1" />
               <span className="hidden sm:inline">Store</span>
             </Button>
-
+          </div>
+          <div className="flex items-center gap-2 flex-wrap">
             <Button
               variant="outline"
               size="sm"
@@ -84,7 +83,7 @@ export function AdminDashboard({ orders, products, totalOrders, totalProducts }:
               <span className="hidden sm:inline">Logout</span>
             </Button>
             {mounted && (
-              <AnimatedThemeToggler/>
+              <AnimatedThemeToggler />
             )}
           </div>
         </div>
