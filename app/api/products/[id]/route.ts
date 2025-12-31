@@ -35,14 +35,37 @@ export async function PUT(
     // Handle image URLs from Cloudinary
     const image_urls = (body.image_urls || []) as string[]
     
-    if (image_urls.length > 0) {
-      // User uploaded new images to Cloudinary
-      updateData.image_url = image_urls[0]
-      if (image_urls.length > 1) {
-        updateData.additional_images = image_urls.slice(1)
-      } else {
-        updateData.additional_images = null
+    // Determine images removed by the update so we can delete them from Cloudinary
+    const { data: existingProduct } = await supabase
+      .from("products")
+      .select("image_url, additional_images")
+      .eq("id", id)
+      .single()
+
+    const existingImgs = [
+      existingProduct?.image_url,
+      ...(existingProduct?.additional_images || []),
+    ].filter(Boolean) as string[]
+
+    // Compute removed images (present in DB but not in incoming image_urls)
+    const removed = existingImgs.filter((url) => !image_urls.includes(url))
+
+    // If there are removed images, delete them from Cloudinary (don't block update on failure)
+    if (removed.length > 0) {
+      for (const url of removed) {
+        try {
+          const pid = extractCloudinaryPublicId(url)
+          if (pid) await deleteFromCloudinary(pid)
+        } catch (err) {
+          console.error("Failed to delete removed image from Cloudinary:", err)
+        }
       }
+    }
+
+    if (image_urls.length > 0) {
+      // User provided image URLs (new or existing) — update DB fields accordingly
+      updateData.image_url = image_urls[0]
+      updateData.additional_images = image_urls.length > 1 ? image_urls.slice(1) : null
     }
     // If no image_urls provided, keep existing images (no update to image fields)
 
