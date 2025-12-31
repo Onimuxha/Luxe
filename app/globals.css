@@ -18,18 +18,18 @@
   font-display: swap;
 }
 
-/* Inter - Body text */
+/* Google Sans - Body text */
 @font-face {
-  font-family: 'Inter';
-  src: url('/fonts/Inter.woff2') format('woff2');
+  font-family: 'Google Sans';
+  src: url('/fonts/GoogleSans.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Inter';
-  src: url('/fonts/Inter-Italic.woff2') format('woff2');
+  font-family: 'Google Sans';
+  src: url('/fonts/GoogleSans-Italic.woff2') format('woff2');
   font-weight: 400;
   font-style: italic;
   font-display: swap;
@@ -124,31 +124,35 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', sans-serif;
   }
 
   @theme inline {
-  --animate-cell-ripple: cell-ripple var(--duration, 200ms) ease-out none 1
-    var(--delay, 0ms);
+    --animate-cell-ripple: cell-ripple var(--duration, 200ms) ease-out none 1 var(--delay, 0ms);
 
-  @keyframes cell-ripple {
-    0% {
-      opacity: 0.4;
-    }
-    50% {
-      opacity: 0.8;
-    }
-    100% {
-      opacity: 0.4;
+    @keyframes cell-ripple {
+      0% {
+        opacity: 0.4;
+      }
+
+      50% {
+        opacity: 0.8;
+      }
+
+      100% {
+        opacity: 0.4;
+      }
     }
   }
-}
 
 
   p,
+  span,
+  div,
+  a,
   li {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Google Sans', sans-serif;
   }
+
 
   /* Headings use Montserrat */
   h1,
@@ -178,10 +182,12 @@
   background: rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
+
 /* Hide scrollbar but keep scroll */
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
